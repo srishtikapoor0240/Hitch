@@ -30,18 +30,21 @@ router.post("/register", async (req, res) => {
       return res.status(200).json({ message: "User already registered", user });
     }
 
-    const phone = decoded.phone_number;
-    if (!phone) {
-      return res.status(400).json({ message: "Phone number not found in token" });
-    }
+    const phone = decoded.phone_number || null;
+  const email = decoded.email || null;
+
+  if (!phone && !email) {
+  return res.status(400).json({ message: "No phone or email found in token" });
+  }
 
     user = new User({
-      firebaseUid: decoded.uid,
-      phone,
-      name,
-      gender,
-      fcmToken: fcmToken || null,
-    });
+  firebaseUid: decoded.uid,
+  phone,
+  email,
+  name,
+  gender,
+  fcmToken: fcmToken || null,
+});
 
     await user.save();
 
