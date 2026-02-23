@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Rides | RideShare</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+color:white;
+min-height:100vh;
+overflow-x:hidden;
+}
+
+/* Navbar */
+
+nav{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:18px 40px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(12px);
+position:sticky;
+top:0;
+z-index:10;
+}
+
+.logo{
+font-size:22px;
+font-weight:600;
+color:#00e5ff;
+}
+
+nav a{
+color:white;
+text-decoration:none;
+margin-left:20px;
+font-size:14px;
+transition:.3s;
+}
+
+nav a:hover{
+color:#00e5ff;
+}
+
+/* Container */
+
+.container{
+max-width:1200px;
+margin:auto;
+padding:30px 20px 80px;
+}
+
+/* Stats */
+
+.stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:20px;
+margin-bottom:30px;
+}
+
+.stat-card{
+background:rgba(255,255,255,0.08);
+padding:20px;
+border-radius:15px;
+backdrop-filter:blur(10px);
+text-align:center;
+transition:.3s;
+}
+
+.stat-card:hover{
+transform:translateY(-5px);
+background:rgba(0,229,255,0.15);
+}
+
+.stat-card h2{
+color:#00e5ff;
+}
+
+/* Tabs */
+
+.tabs{
+display:flex;
+gap:15px;
+margin-bottom:25px;
+flex-wrap:wrap;
+}
+
+.tab{
+padding:10px 20px;
+border-radius:25px;
+background:rgba(255,255,255,0.08);
+cursor:pointer;
+transition:.3s;
+}
+
+.tab.active{
+background:#00e5ff;
+color:black;
+font-weight:600;
+}
+
+/* Ride Card */
+
+.ride-card{
+background:rgba(255,255,255,0.08);
+border-radius:18px;
+padding:20px;
+margin-bottom:25px;
+backdrop-filter:blur(12px);
+transition:.3s;
+}
+
+.ride-card:hover{
+transform:translateY(-5px);
+background:rgba(0,229,255,0.12);
+}
+
+.route{
+font-size:18px;
+font-weight:600;
+margin-bottom:10px;
+color:#00e5ff;
+}
+
+.details{
+display:flex;
+justify-content:space-between;
+flex-wrap:wrap;
+font-size:14px;
+margin-bottom:15px;
+opacity:.9;
+}
+
+/* Timeline */
+
+.timeline{
+display:flex;
+justify-content:space-between;
+margin:20px 0;
+position:relative;
+}
+
+.timeline::before{
+content:"";
+position:absolute;
+top:50%;
+left:0;
+width:100%;
+height:3px;
+background:rgba(255,255,255,0.2);
+z-index:-1;
+}
+
+.step{
+text-align:center;
+flex:1;
+}
+
+.circle{
+width:18px;
+height:18px;
+border-radius:50%;
+margin:auto;
+margin-bottom:5px;
+background:gray;
+}
+
+.step.active .circle{
+background:#00e5ff;
+}
+
+/* Driver */
+
+.driver{
+display:flex;
+align-items:center;
+gap:15px;
+margin:15px 0;
+}
+
+.driver img{
+width:50px;
+height:50px;
+border-radius:50%;
+}
+
+.rating{
+color:gold;
+font-size:14px;
+}
+
+/* Payment */
+
+.payment{
+background:rgba(0,0,0,0.25);
+padding:12px;
+border-radius:10px;
+margin-top:10px;
+font-size:14px;
+}
+
+/* Buttons */
+
+.actions{
+margin-top:15px;
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+button{
+border:none;
+padding:10px 18px;
+border-radius:25px;
+cursor:pointer;
+font-size:13px;
+transition:.3s;
+}
+
+.track{
+background:#00e5ff;
+color:black;
+}
+
+.chat{
+background:#4caf50;
+color:white;
+}
+
+.cancel{
+background:#ff4d4d;
+color:white;
+}
+
+.rate{
+background:gold;
+color:black;
+}
+
+button:hover{
+transform:scale(1.05);
+}
+
+/* Rating Stars */
+
+.stars span{
+font-size:20px;
+cursor:pointer;
+}
+
+/* Filter */
+
+.filter{
+margin-bottom:20px;
+}
+
+select{
+padding:8px 12px;
+border-radius:8px;
+border:none;
+}
+
+/* Responsive */
+
+@media(max-width:600px){
+
+.details{
+flex-direction:column;
+gap:5px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<nav>
+<div class="logo">RideShare</div>
+<div>
+<a href="dashboard.html">Dashboard</a>
+<a href="find-ride.html">Find Ride</a>
+<a href="offer-ride.html">Offer Ride</a>
+<a href="index.html">Logout</a>
+</div>
+</nav>
+
+<div class="container">
+
+<h1 style="margin-bottom:20px;">My Rides</h1>
+
+<!-- Stats -->
+
+<div class="stats">
+
+<div class="stat-card">
+<h2>12</h2>
+<p>Total Rides</p>
+</div>
+
+<div class="stat-card">
+<h2>₹2,450</h2>
+<p>Money Saved</p>
+</div>
+
+<div class="stat-card">
+<h2>8</h2>
+<p>Completed</p>
+</div>
+
+<div class="stat-card">
+<h2>15kg</h2>
+<p>CO₂ Saved 🌱</p>
+</div>
+
+</div>
+
+<!-- Filter -->
+
+<div class="filter">
+<select>
+<option>All Rides</option>
+<option>Upcoming</option>
+<option>Completed</option>
+<option>Cancelled</option>
+</select>
+</div>
+
+<!-- Tabs -->
+
+<div class="tabs">
+<div class="tab active">Booked</div>
+<div class="tab">Offered</div>
+<div class="tab">Completed</div>
+</div>
+
+<!-- Ride Card -->
+
+<div class="ride-card">
+
+<div class="route">Delhi → Jaipur</div>
+
+<div class="details">
+<div>Date: 25 Feb 2026</div>
+<div>Time: 10:00 AM</div>
+<div>Seats: 2</div>
+<div>Fare: ₹500</div>
+</div>
+
+<!-- Timeline -->
+
+<div class="timeline">
+
+<div class="step active">
+<div class="circle"></div>
+<small>Booked</small>
+</div>
+
+<div class="step active">
+<div class="circle"></div>
+<small>Confirmed</small>
+</div>
+
+<div class="step">
+<div class="circle"></div>
+<small>Started</small>
+</div>
+
+<div class="step">
+<div class="circle"></div>
+<small>Completed</small>
+</div>
+
+</div>
+
+<!-- Driver -->
+
+<div class="driver">
+<img src="https://randomuser.me/api/portraits/men/32.jpg">
+<div>
+<div>Rahul Sharma</div>
+<div class="rating">⭐ 4.8</div>
+</div>
+</div>
+
+<!-- Payment -->
+
+<div class="payment">
+Payment: UPI • Paid ₹500
+</div>
+
+<!-- Actions -->
+
+<div class="actions">
+<button class="track">Track Ride</button>
+<button class="chat">Chat</button>
+<button class="cancel">Cancel</button>
+<button class="rate">Rate</button>
+</div>
+
+<!-- Rating Stars -->
+
+<div class="stars" style="margin-top:10px;">
+<span onclick="rate(this)">⭐</span>
+<span onclick="rate(this)">⭐</span>
+<span onclick="rate(this)">⭐</span>
+<span onclick="rate(this)">⭐</span>
+<span onclick="rate(this)">⭐</span>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+/* Tabs */
+
+const tabs=document.querySelectorAll(".tab");
+
+tabs.forEach(tab=>{
+tab.addEventListener("click",()=>{
+tabs.forEach(t=>t.classList.remove("active"));
+tab.classList.add("active");
+});
+});
+
+/* Rating */
+
+function rate(star){
+
+let stars=star.parentElement.children;
+
+for(let i=0;i<stars.length;i++){
+
+if(i<=Array.from(stars).indexOf(star)){
+stars[i].style.color="gold";
+}else{
+stars[i].style.color="gray";
+}
+
+}
+
+}
+
+</script>
+
+</body>
+</html>

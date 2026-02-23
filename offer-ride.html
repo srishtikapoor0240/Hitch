@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offer Ride</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color:white;
+}
+
+/* Container */
+.container{
+    width:90%;
+    max-width:1100px;
+    margin:30px auto;
+}
+
+/* Glass Card */
+.card{
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(15px);
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* Title */
+h1{
+    text-align:center;
+}
+
+/* Inputs */
+input,select{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border:none;
+    border-radius:8px;
+    outline:none;
+}
+
+/* Row */
+.row{
+    display:flex;
+    gap:15px;
+}
+
+/* Buttons */
+button{
+    background:linear-gradient(45deg,#00c6ff,#0072ff);
+    border:none;
+    padding:12px;
+    border-radius:10px;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    width:100%;
+    transition:0.3s;
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+/* Vehicle */
+.vehicle-options{
+    display:flex;
+    gap:10px;
+}
+
+.vehicle{
+    flex:1;
+    text-align:center;
+    padding:12px;
+    border-radius:10px;
+    background:rgba(255,255,255,0.1);
+    cursor:pointer;
+}
+
+.vehicle.active{
+    background:#00c6ff;
+}
+
+/* Seat Visual */
+.seats{
+    display:flex;
+    gap:5px;
+    margin-top:10px;
+}
+
+.seat{
+    width:30px;
+    height:30px;
+    border-radius:6px;
+    background:gray;
+}
+
+.seat.active{
+    background:#00ffcc;
+}
+
+/* Checkbox Grid */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+}
+
+/* Preview */
+.preview{
+    background:rgba(255,255,255,0.12);
+    padding:15px;
+    border-radius:12px;
+}
+
+/* Toast */
+.toast{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#00ffcc;
+    color:black;
+    padding:15px 20px;
+    border-radius:10px;
+    display:none;
+    font-weight:bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🚘 Offer a Ride</h1>
+
+<div class="card">
+
+<h3>Route Details</h3>
+
+<input type="text" id="from" placeholder="From Location">
+<input type="text" id="to" placeholder="To Location">
+
+<div class="row">
+<input type="date" id="date">
+
+<div class="row" style="flex:1;">
+<input type="time" id="time">
+<select id="ampm">
+<option>AM</option>
+<option>PM</option>
+</select>
+</div>
+</div>
+
+<button onclick="calculateDistance()">📍 Estimate Distance</button>
+
+<p id="distanceInfo"></p>
+
+</div>
+
+<div class="card">
+
+<h3>Vehicle</h3>
+
+<div class="vehicle-options">
+<div class="vehicle active" onclick="selectVehicle(this,'Car')">🚗 Car</div>
+<div class="vehicle" onclick="selectVehicle(this,'Bike')">🏍 Bike</div>
+<div class="vehicle" onclick="selectVehicle(this,'Auto')">🛺 Auto</div>
+</div>
+
+<h3>Seats</h3>
+
+<input type="number" id="seatCount" value="2" min="1" max="6" onchange="updateSeats()">
+
+<div class="seats" id="seatVisual"></div>
+
+</div>
+
+<div class="card">
+
+<h3>Price</h3>
+
+<input type="number" id="price" placeholder="Price per seat ₹">
+
+<button onclick="suggestPrice()">💡 Suggest Price</button>
+
+<p id="earningInfo"></p>
+
+</div>
+
+<div class="card">
+
+<h3>Pickup Points</h3>
+
+<div class="grid">
+<label><input type="checkbox"> Main Gate</label>
+<label><input type="checkbox"> Hostel</label>
+<label><input type="checkbox"> Parking</label>
+<label><input type="checkbox"> Custom</label>
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>Ride Preferences</h3>
+
+<div class="grid">
+<label><input type="checkbox"> Female Only</label>
+<label><input type="checkbox"> Music Allowed</label>
+<label><input type="checkbox"> Quiet Ride</label>
+<label><input type="checkbox"> AC Required</label>
+<label><input type="checkbox"> No Smoking</label>
+<label><input type="checkbox"> Pets Allowed</label>
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>Recurring Ride</h3>
+
+<select>
+<option>One Time</option>
+<option>Daily</option>
+<option>Weekly</option>
+</select>
+
+</div>
+
+<div class="card">
+
+<h3>Driver Details</h3>
+
+<input type="text" placeholder="Driver Name">
+<input type="tel" placeholder="Phone Number">
+<input type="text" placeholder="College ID (optional)">
+
+</div>
+
+<div class="card">
+
+<button onclick="previewRide()">Preview Ride</button>
+
+<div id="previewBox"></div>
+
+</div>
+
+</div>
+
+<div id="toast" class="toast">✅ Ride Posted Successfully</div>
+
+<script>
+
+let selectedVehicle="Car";
+
+function selectVehicle(el,vehicle){
+    document.querySelectorAll(".vehicle").forEach(v=>v.classList.remove("active"));
+    el.classList.add("active");
+    selectedVehicle=vehicle;
+}
+
+function updateSeats(){
+    const count=document.getElementById("seatCount").value;
+    const container=document.getElementById("seatVisual");
+
+    container.innerHTML="";
+
+    for(let i=0;i<count;i++){
+        container.innerHTML+="<div class='seat active'></div>";
+    }
+}
+
+updateSeats();
+
+function calculateDistance(){
+
+    const km=Math.floor(Math.random()*20)+5;
+    const fuel=km*7;
+    const time=km*2;
+
+    document.getElementById("distanceInfo").innerHTML=
+    `Distance: ${km} km | Time: ${time} mins | Fuel Cost: ₹${fuel}`;
+}
+
+function suggestPrice(){
+
+    const base=selectedVehicle==="Car"?120:selectedVehicle==="Bike"?60:80;
+    document.getElementById("price").value=base;
+    calculateEarning();
+}
+
+function calculateEarning(){
+
+    const price=document.getElementById("price").value||0;
+    const seats=document.getElementById("seatCount").value||0;
+
+    const total=price*seats;
+    const fuel=50;
+    const profit=total-fuel;
+
+    document.getElementById("earningInfo").innerHTML=
+    `Total Earning: ₹${total} | Estimated Profit: ₹${profit}`;
+}
+
+document.getElementById("price").addEventListener("input",calculateEarning);
+
+function previewRide(){
+
+    const from=document.getElementById("from").value;
+    const to=document.getElementById("to").value;
+    const price=document.getElementById("price").value;
+    const seats=document.getElementById("seatCount").value;
+
+    document.getElementById("previewBox").innerHTML=`
+        <div class="preview">
+        <h3>Ride Preview</h3>
+        <p><b>${from}</b> ➜ <b>${to}</b></p>
+        <p>Vehicle: ${selectedVehicle}</p>
+        <p>Seats: ${seats}</p>
+        <p>Price: ₹${price}/seat</p>
+
+        <button onclick="postRide()">Confirm & Post</button>
+        </div>
+    `;
+}
+
+function postRide(){
+
+    document.getElementById("previewBox").innerHTML="";
+
+    const toast=document.getElementById("toast");
+    toast.style.display="block";
+
+    setTimeout(()=>{
+        toast.style.display="none";
+    },3000);
+}
+
+</script>
+
+</body>
+</html>

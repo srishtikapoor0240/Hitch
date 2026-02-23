@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TravelBuddy</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#4F46E5,#06B6D4);
+    min-height:100vh;
+    color:white;
+}
+
+/* NAVBAR */
+
+.navbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 50px;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:700;
+}
+
+.nav-links a{
+    text-decoration:none;
+    color:white;
+    margin:0 15px;
+    font-weight:500;
+}
+
+.nav-links a:hover{
+    color:#FFD700;
+}
+
+/* BUTTON */
+
+.btn{
+    background:white;
+    color:#4F46E5;
+    padding:10px 22px;
+    border-radius:30px;
+    font-weight:600;
+    text-decoration:none;
+    transition:0.3s;
+}
+
+.btn:hover{
+    background:#4F46E5;
+    color:white;
+}
+
+/* HERO */
+
+.hero{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:60px;
+    flex-wrap:wrap;
+}
+
+.hero-text{
+    max-width:500px;
+}
+
+.hero-text h1{
+    font-size:42px;
+    margin-bottom:20px;
+}
+
+.hero-text p{
+    margin-bottom:25px;
+    line-height:1.6;
+}
+
+.hero img{
+    width:420px;
+}
+
+/* FEATURES */
+
+.features{
+    background:white;
+    color:#333;
+    padding:60px;
+    border-radius:30px 30px 0 0;
+}
+
+.feature-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:25px;
+    margin-top:30px;
+}
+
+.feature{
+    background:#f4f7fb;
+    padding:20px;
+    border-radius:15px;
+    text-align:center;
+    transition:0.3s;
+}
+
+.feature:hover{
+    transform:translateY(-5px);
+}
+
+/* HOW IT WORKS */
+
+.how-section{
+    background:linear-gradient(135deg,#4F46E5,#06B6D4);
+    padding:70px 40px;
+    color:white;
+    text-align:center;
+}
+
+.how-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:25px;
+    margin-top:40px;
+}
+
+.how-card{
+    background:rgba(255,255,255,0.15);
+    padding:25px;
+    border-radius:15px;
+    backdrop-filter:blur(10px);
+}
+
+/* CTA */
+
+.cta{
+    background:#f4f7fb;
+    padding:60px 20px;
+    text-align:center;
+    color:#333;
+}
+
+.cta h2{
+    margin-bottom:20px;
+}
+
+/* FOOTER */
+
+.footer{
+    background:#0f172a;
+    color:white;
+    text-align:center;
+    padding:20px;
+}
+
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+
+<div class="navbar">
+
+    <div class="logo">🚗 TravelBuddy</div>
+
+    <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="find_ride.html">Find Ride</a>
+        <a href="offer-ride.html">Offer Ride</a>
+        <a href="my-rides.html">My Rides</a>
+        <a href="chat.html">Chat</a>
+        <a href="notifications.html">Notifications</a>
+        <a href="profile.html">Profile</a>
+    </div>
+
+    <a href="login.html" class="btn">Sign In / Sign Up</a>
+
+</div>
+
+
+<!-- HERO -->
+
+<div class="hero">
+
+    <div class="hero-text">
+        <h1>Find Travel Partners Easily 🚀</h1>
+        <p>
+            Connect with students traveling the same route.
+            Share rides, save money, and travel safely together.
+        </p>
+
+        <a href="find_ride.html" class="btn">Get Started</a>
+    </div>
+
+    <img src="assets/travel1.png.png" alt="Travel Image">
+
+</div>
+
+
+<!-- FEATURES -->
+
+<div class="features">
+
+    <h2 style="text-align:center;">Why Choose TravelBuddy?</h2>
+
+    <div class="feature-grid">
+
+        <div class="feature">
+            <h3>🔍 Smart Search</h3>
+            <p>Find people traveling the same route instantly.</p>
+        </div>
+
+        <div class="feature">
+            <h3>💬 Chat System</h3>
+            <p>Communicate with travel partners securely.</p>
+        </div>
+
+        <div class="feature">
+            <h3>🔔 Notifications</h3>
+            <p>Get updates about ride requests and approvals.</p>
+        </div>
+
+        <div class="feature">
+            <h3>💰 Save Money</h3>
+            <p>Share travel costs with others.</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- HOW IT WORKS -->
+
+<div class="how-section">
+
+    <h2>How It Works</h2>
+
+    <div class="how-grid">
+
+        <div class="how-card">
+            <h3>1. Search Ride</h3>
+            <p>Enter your destination and travel details.</p>
+        </div>
+
+        <div class="how-card">
+            <h3>2. Match</h3>
+            <p>Browse available rides or create your own.</p>
+        </div>
+
+        <div class="how-card">
+            <h3>3. Travel</h3>
+            <p>Connect and start your journey together.</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CTA -->
+
+<div class="cta">
+
+    <h2>Ready to Start Your Journey?</h2>
+
+    <a href="find_ride.html" class="btn">Find a Ride</a>
+
+</div>
+
+
+<!-- FOOTER -->
+
+<div class="footer">
+    © 2026 TravelBuddy | Developed for Web Project
+</div>
+
+
+</body>
+</html>

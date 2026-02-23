@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard | TravelBuddy</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#4F46E5,#06B6D4);
+    min-height:100vh;
+    display:flex;
+    color:white;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:230px;
+    background:rgba(255,255,255,0.15);
+    backdrop-filter:blur(15px);
+    padding:25px;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.logo{
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+.menu a{
+    display:block;
+    padding:12px;
+    border-radius:10px;
+    color:white;
+    text-decoration:none;
+    transition:0.3s;
+}
+
+.menu a:hover{
+    background:rgba(255,255,255,0.25);
+}
+
+/* MAIN */
+
+.main{
+    flex:1;
+    padding:25px;
+}
+
+/* TOPBAR */
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.search{
+    padding:10px 15px;
+    border:none;
+    border-radius:20px;
+    width:250px;
+}
+
+.top-right{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.bell{
+    position:relative;
+    cursor:pointer;
+    font-size:20px;
+}
+
+.badge{
+    position:absolute;
+    top:-5px;
+    right:-8px;
+    background:red;
+    font-size:10px;
+    padding:3px 6px;
+    border-radius:50%;
+}
+
+.profile{
+    background:white;
+    color:#4F46E5;
+    padding:8px 15px;
+    border-radius:20px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+/* GRID */
+
+.grid{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:20px;
+}
+
+/* ACTIONS */
+
+.actions{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+}
+
+.card{
+    background:rgba(255,255,255,0.15);
+    backdrop-filter:blur(10px);
+    padding:20px;
+    border-radius:18px;
+    cursor:pointer;
+    transition:0.3s;
+    text-align:center;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+    background:rgba(255,255,255,0.25);
+}
+
+/* STATS */
+
+.stats{
+    margin-top:20px;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+}
+
+.stat{
+    background:white;
+    color:#4F46E5;
+    padding:18px;
+    border-radius:15px;
+    text-align:center;
+    font-weight:600;
+}
+
+.stat span{
+    display:block;
+    font-size:20px;
+    margin-top:5px;
+}
+
+/* RIGHT PANEL */
+
+.right{
+    background:rgba(255,255,255,0.15);
+    backdrop-filter:blur(10px);
+    border-radius:20px;
+    padding:20px;
+}
+
+/* ACTIVITY */
+
+.activity{
+    margin-top:20px;
+    font-size:14px;
+}
+
+.activity div{
+    margin-bottom:10px;
+}
+
+/* FLOAT BUTTON */
+
+.float-btn{
+    position:fixed;
+    bottom:30px;
+    right:30px;
+    background:white;
+    color:#4F46E5;
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:28px;
+    cursor:pointer;
+    box-shadow:0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* DARK MODE */
+
+.dark{
+    background:#0f172a;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+    <div class="logo">🚗 TravelBuddy</div>
+
+    <div class="menu">
+        <a href="#">Dashboard</a>
+        <a href="find-ride.html">Find Ride</a>
+        <a href="offer-ride.html">Offer Ride</a>
+        <a href="my-rides.html">My Rides</a>
+        <a href="chat.html">Chat</a>
+        <a href="profile.html">Profile</a>
+    </div>
+
+    <button onclick="toggleDark()">🌙 Dark Mode</button>
+
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+    <div class="topbar">
+
+        <input class="search" placeholder="Search rides...">
+
+        <div class="top-right">
+
+            <div class="bell">
+                🔔
+                <div class="badge">3</div>
+            </div>
+
+            <div class="profile">Yashika</div>
+
+        </div>
+
+    </div>
+
+    <div class="grid">
+
+        <!-- LEFT -->
+
+        <div>
+
+            <div class="actions">
+
+                <div class="card" onclick="location.href='find-ride.html'">
+                    🚕
+                    <h3>Find Ride</h3>
+                </div>
+
+                <div class="card" onclick="location.href='offer-ride.html'">
+                    🚗
+                    <h3>Offer Ride</h3>
+                </div>
+
+                <div class="card" onclick="location.href='my-rides.html'">
+                    📍
+                    <h3>My Rides</h3>
+                </div>
+
+                <div class="card" onclick="location.href='chat.html'">
+                    💬
+                    <h3>Chat</h3>
+                </div>
+
+            </div>
+
+            <!-- STATS -->
+
+            <div class="stats">
+
+                <div class="stat">
+                    Rides Taken
+                    <span>12</span>
+                </div>
+
+                <div class="stat">
+                    Rides Offered
+                    <span>7</span>
+                </div>
+
+                <div class="stat">
+                    Money Saved
+                    <span>₹1850</span>
+                </div>
+
+                <div class="stat">
+                    Rating
+                    <span>⭐ 4.8</span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT PANEL -->
+
+        <div class="right">
+
+            <h3>📊 Ride Analytics</h3>
+
+            <canvas id="chart"></canvas>
+
+            <div class="activity">
+
+                <h4>Recent Activity</h4>
+
+                <div>✅ Joined ride to Airport</div>
+                <div>🚗 Offered ride to Station</div>
+                <div>⭐ Received 5 star rating</div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- FLOAT BUTTON -->
+
+<div class="float-btn">+</div>
+
+<script>
+
+/* CHART */
+
+new Chart(document.getElementById('chart'), {
+    type: 'line',
+    data: {
+        labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+        datasets: [{
+            label: 'Rides',
+            data: [1,3,2,5,4,6,3],
+            borderColor: 'white',
+            backgroundColor:'rgba(255,255,255,0.3)',
+            fill:true
+        }]
+    },
+    options:{
+        plugins:{legend:{display:false}},
+        scales:{
+            x:{ticks:{color:'white'}},
+            y:{ticks:{color:'white'}}
+        }
+    }
+});
+
+/* DARK MODE */
+
+function toggleDark(){
+    document.body.classList.toggle("dark");
+}
+
+</script>
+
+</body>
+</html>
