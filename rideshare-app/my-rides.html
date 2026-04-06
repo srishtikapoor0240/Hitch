@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hitch — My Rides</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 60px;
+      background: rgba(8,9,13,0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 100;
+    }
+    .top-bar h1 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; }
+    .logout-btn {
+      background: none;
+      border: none;
+      color: var(--txt-3);
+      cursor: pointer;
+      font-size: 13px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+    .content { padding: 72px 0 90px; }
+
+    /* ─── Tab switcher ─── */
+    .tab-bar {
+      display: flex;
+      padding: 12px 16px 0;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab-item {
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--txt-3);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .tab-item.active {
+      color: var(--orange);
+      border-bottom-color: var(--orange);
+    }
+
+    /* ─── Ride card ─── */
+    .rides-list {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .my-ride-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      animation: fadeUp 0.3s ease both;
+      transition: border-color 0.2s;
+    }
+    .my-ride-card:hover { border-color: var(--border-hov); }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+    .ride-top {
+      padding: 16px 18px;
+    }
+    .ride-route-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .city { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; }
+    .arr-icon { color: var(--orange); }
+
+    .ride-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .chip {
+      font-size: 11px;
+      color: var(--txt-2);
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 3px 10px;
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    .chip svg { width: 11px; height: 11px; }
+
+    /* ─── Passengers section ─── */
+    .passengers-section {
+      border-top: 1px solid var(--border);
+    }
+    .passengers-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s;
+    }
+    .passengers-header:hover { background: rgba(255,255,255,0.02); }
+    .passengers-header h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--txt-2);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .passengers-toggle {
+      color: var(--txt-3);
+      transition: transform 0.2s;
+    }
+    .passengers-toggle.open { transform: rotate(180deg); }
+
+    .passengers-body {
+      padding: 0 18px 14px;
+      display: none;
+    }
+    .passengers-body.open { display: block; }
+
+    .user-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+    .user-row:last-child { border-bottom: none; }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .uid-text {
+      font-size: 12px;
+      color: var(--txt-2);
+      font-family: monospace;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 160px;
+    }
+
+    .confirmed-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--green);
+      background: var(--green-dim);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 100px;
+      padding: 4px 10px;
+    }
+
+    /* ─── No passengers ─── */
+    .no-passengers {
+      text-align: center;
+      padding: 20px 0;
+      color: var(--txt-3);
+      font-size: 13px;
+    }
+
+    /* ─── Stats strip ─── */
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      background: var(--bg-input);
+      border-top: 1px solid var(--border);
+    }
+    .stat-cell {
+      text-align: center;
+      padding: 10px;
+      border-right: 1px solid var(--border);
+    }
+    .stat-cell:last-child { border-right: none; }
+    .stat-val { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; }
+    .stat-val.orange { color: var(--orange); }
+    .stat-val.green  { color: var(--green); }
+    .stat-label { font-size: 10px; color: var(--txt-3); margin-top: 1px; text-transform: uppercase; letter-spacing: 0.06em; }
+  </style>
+</head>
+<body>
+  <div id="toast-container"></div>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <h1>My Rides</h1>
+    <button class="logout-btn" onclick="handleLogout()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign Out
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <div class="tab-item active" onclick="switchView('offered')" id="tab-offered">Rides I Offered</div>
+      <div class="tab-item" onclick="switchView('interested')" id="tab-interested">My Interests</div>
+    </div>
+
+    <div class="rides-list" id="rides-list">
+      <!-- Loading skeletons -->
+      <div class="my-ride-card">
+        <div class="ride-top">
+          <div class="skeleton" style="height:22px;width:55%;margin-bottom:12px"></div>
+          <div class="skeleton" style="height:14px;width:80%"></div>
+        </div>
+      </div>
+      <div class="my-ride-card">
+        <div class="ride-top">
+          <div class="skeleton" style="height:22px;width:48%;margin-bottom:12px"></div>
+          <div class="skeleton" style="height:14px;width:70%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a class="nav-item" href="find-ride.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Find
+    </a>
+    <a class="nav-item" href="offer-ride.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      Offer
+    </a>
+    <a class="nav-item active" href="my-rides.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      My Rides
+    </a>
+  </nav>
+
+  <script src="utils.js"></script>
+  <script>
+    if (!requireAuth()) throw new Error('Not authenticated');
+
+    let allRides   = [];
+    let currentView = 'offered';
+    const myUid    = getUserId();
+
+    async function loadRides() {
+      try {
+        allRides = await apiFetch('/rides');
+        renderView();
+      } catch (err) {
+        showToast(err.message, 'error');
+        document.getElementById('rides-list').innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <h3>Failed to load</h3><p>${err.message}</p>
+          </div>`;
+      }
+    }
+
+    window.switchView = function(view) {
+      currentView = view;
+      document.getElementById('tab-offered').classList.toggle('active', view === 'offered');
+      document.getElementById('tab-interested').classList.toggle('active', view === 'interested');
+      renderView();
+    };
+
+    function renderView() {
+      const list = document.getElementById('rides-list');
+      list.innerHTML = '';
+
+      let rides = [];
+      if (currentView === 'offered') {
+        rides = allRides.filter(r => r.postedBy === myUid);
+      } else {
+        rides = allRides.filter(r =>
+          r.interestedUsers?.includes(myUid) || r.confirmedUsers?.includes(myUid)
+        );
+      }
+
+      if (rides.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/>
+              <rect x="9" y="11" width="14" height="10" rx="2"/>
+              <circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+            </svg>
+            <h3>${currentView === 'offered' ? "You haven't offered any rides" : "No ride interests yet"}</h3>
+            <p>${currentView === 'offered'
+              ? 'Post a ride to share it with other students.'
+              : 'Browse rides and tap "I\'m Interested" to join.'}</p>
+            <a href="${currentView === 'offered' ? 'offer-ride.html' : 'find-ride.html'}"
+               class="btn btn-primary btn-sm" style="margin-top:14px;text-decoration:none">
+              ${currentView === 'offered' ? 'Offer a Ride' : 'Find Rides'}
+            </a>
+          </div>`;
+        return;
+      }
+
+      rides.forEach((ride, i) => {
+        const card = document.createElement('div');
+        card.className = 'my-ride-card';
+        card.style.animationDelay = `${i * 0.07}s`;
+
+        const interested = ride.interestedUsers || [];
+        const confirmed  = ride.confirmedUsers  || [];
+        const seatsLeft  = ride.seatsLeft ?? ride.totalSeats;
+
+        if (currentView === 'offered') {
+          // Show full management card
+          const interestedRows = interested.map(uid => `
+            <div class="user-row" id="row-${uid}">
+              <div class="user-info">
+                <div class="avatar">${uid[0].toUpperCase()}</div>
+                <div>
+                  <div class="uid-text" title="${uid}">${uid}</div>
+                  <div style="font-size:11px;color:var(--txt-3)">Interested</div>
+                </div>
+              </div>
+              <button class="btn btn-sm btn-ghost"
+                onclick="confirmUser('${ride.id}', '${uid}', this)"
+                ${seatsLeft <= 0 ? 'disabled' : ''}>
+                ${seatsLeft <= 0 ? 'Full' : 'Confirm'}
+              </button>
+            </div>
+          `).join('');
+
+          const confirmedRows = confirmed.map(uid => `
+            <div class="user-row">
+              <div class="user-info">
+                <div class="avatar" style="background:var(--green-dim);color:var(--green);border-color:rgba(34,197,94,0.3)">
+                  ${uid[0].toUpperCase()}
+                </div>
+                <div>
+                  <div class="uid-text" title="${uid}">${uid}</div>
+                  <div style="font-size:11px;color:var(--green)">Confirmed passenger</div>
+                </div>
+              </div>
+              <span class="confirmed-badge">✓ Confirmed</span>
+            </div>
+          `).join('');
+
+          const hasPassengers = interested.length > 0 || confirmed.length > 0;
+
+          card.innerHTML = `
+            <div class="ride-top">
+              <div class="ride-route-row">
+                <span class="city">${ride.from}</span>
+                <svg class="arr-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                <span class="city">${ride.to}</span>
+              </div>
+              <div class="ride-chips">
+                <span class="chip">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  ${formatDate(ride.date)}
+                </span>
+                <span class="chip">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  ${ride.timeRange}
+                </span>
+                <span class="chip">${ride.mode}</span>
+                <span class="chip" style="color:${seatsLeft > 0 ? 'var(--orange)':'var(--red)'}">
+                  ${seatsLeft}/${ride.totalSeats} seats left
+                </span>
+              </div>
+            </div>
+
+            <div class="stats-strip">
+              <div class="stat-cell">
+                <div class="stat-val orange">${interested.length}</div>
+                <div class="stat-label">Interested</div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-val green">${confirmed.length}</div>
+                <div class="stat-label">Confirmed</div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-val">${seatsLeft}</div>
+                <div class="stat-label">Seats Left</div>
+              </div>
+            </div>
+
+            <div class="passengers-section">
+              <div class="passengers-header" onclick="togglePassengers(this)">
+                <h3>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                  Passengers
+                  ${hasPassengers ? `<span class="badge badge-orange">${interested.length + confirmed.length}</span>` : ''}
+                </h3>
+                <svg class="passengers-toggle" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+              <div class="passengers-body">
+                ${!hasPassengers
+                  ? `<p class="no-passengers">No one has shown interest yet</p>`
+                  : confirmedRows + interestedRows
+                }
+              </div>
+            </div>
+          `;
+        } else {
+          // Interested view — show status
+          const myStatus = confirmed.includes(myUid) ? 'confirmed' : 'pending';
+          card.innerHTML = `
+            <div class="ride-top">
+              <div class="ride-route-row">
+                <span class="city">${ride.from}</span>
+                <svg class="arr-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                <span class="city">${ride.to}</span>
+              </div>
+              <div class="ride-chips">
+                <span class="chip">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  ${formatDate(ride.date)}
+                </span>
+                <span class="chip">${ride.timeRange}</span>
+                <span class="chip">${ride.mode}</span>
+              </div>
+            </div>
+            <div style="padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+              <div>
+                <div style="font-size:12px;color:var(--txt-3)">Your status</div>
+                <div style="font-size:14px;font-weight:600;color:${myStatus === 'confirmed' ? 'var(--green)' : 'var(--orange)'}">
+                  ${myStatus === 'confirmed' ? '✓ Confirmed — you\'re in!' : '⏳ Pending confirmation'}
+                </div>
+              </div>
+              ${myStatus === 'confirmed'
+                ? `<span class="badge badge-green">CONFIRMED</span>`
+                : `<span class="badge badge-orange">PENDING</span>`}
+            </div>
+          `;
+        }
+
+        list.appendChild(card);
+      });
+    }
+
+    window.togglePassengers = function(headerEl) {
+      const body   = headerEl.nextElementSibling;
+      const toggle = headerEl.querySelector('.passengers-toggle');
+      body.classList.toggle('open');
+      toggle.classList.toggle('open');
+    };
+
+    window.confirmUser = async function(rideId, userId, btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner"></div>';
+      try {
+        await apiFetch(`/rides/${rideId}/confirm`, {
+          method: 'POST',
+          body: JSON.stringify({ userId })
+        });
+        showToast('Passenger confirmed!', 'success');
+        // Reload data to reflect changes
+        await loadRides();
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'Confirm';
+        showToast(err.message, 'error');
+      }
+    };
+
+    window.handleLogout = function() {
+      if (confirm('Sign out of Hitch?')) {
+        clearAuth();
+        window.location.href = 'login.html';
+      }
+    };
+
+    loadRides();
+  </script>
+</body>
+</html>
