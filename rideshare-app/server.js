@@ -1,3 +1,4 @@
+console.log("🔥 THIS FILE IS RUNNING");
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
@@ -106,8 +107,42 @@ app.post('/rides/:rideId/interest', verifyToken, async (req, res) => {
 
   res.json({ success: true });
 });
+console.log("✅ Confirm route registered");
+// ✅ CONFIRM USER (move from interested → confirmed)
+app.post('/rides/:rideId/confirm', verifyToken, async (req, res) => {
+  const { userId } = req.body;
+  
+  const rideRef = db.collection('rides').doc(req.params.rideId);
+  const rideSnap = await rideRef.get();
+
+  if (!rideSnap.exists) {
+    return res.status(404).json({ error: 'Ride not found' });
+  }
+
+  const ride = rideSnap.data();
+
+  // 🔒 Only ride owner can confirm
+  if (ride.postedBy !== req.user.uid) {
+    return res.status(403).json({ error: 'Not authorized' });
+  }
+
+  // ❌ User must be in interestedUsers
+  //if (!ride.interestedUsers.includes(userId)) {
+    //return res.status(400).json({ error: 'User not interested' });
+ // }
+
+  // 🚀 Update ride
+  await rideRef.update({
+    interestedUsers: admin.firestore.FieldValue.arrayRemove(userId),
+    confirmedUsers: admin.firestore.FieldValue.arrayUnion(userId),
+    seatsLeft: ride.seatsLeft - 1,
+  });
+
+  res.json({ success: true });
+});
 // 🚀 START SERVER
 const PORT = 5050;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+

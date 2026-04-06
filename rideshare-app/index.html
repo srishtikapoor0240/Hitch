@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hitch — Student Rides</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #08090D;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-family: 'Syne', sans-serif;
+    }
+
+    /* ─── Road ─── */
+    .road {
+      position: absolute;
+      bottom: 30%;
+      left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #1E2230 20%, #1E2230 80%, transparent);
+    }
+    .road::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0; right: 0;
+      height: 1px;
+      background: repeating-linear-gradient(
+        90deg,
+        #F97316 0px, #F97316 30px,
+        transparent 30px, transparent 60px
+      );
+      animation: dashMove 0.4s linear infinite;
+    }
+    @keyframes dashMove {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-60px); }
+    }
+
+    /* ─── Car SVG ─── */
+    .car-wrap {
+      position: absolute;
+      bottom: calc(30% + 4px);
+      animation: carRide 2.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    @keyframes carRide {
+      0%   { left: -200px; opacity: 0; }
+      8%   { opacity: 1; }
+      60%  { left: 50%; transform: translateX(-50%); }
+      72%  { left: 50%; transform: translateX(-50%) scale(1); }
+      80%  { left: 50%; transform: translateX(-50%) scale(1.04); }
+      88%  { left: 50%; transform: translateX(-50%) scale(1); }
+      100% { left: 50%; transform: translateX(-50%); }
+    }
+
+    /* Wheel bob */
+    .car-svg {
+      filter: drop-shadow(0 8px 24px rgba(249,115,22,0.45));
+      animation: wheelBob 0.18s ease-in-out infinite alternate;
+    }
+    @keyframes wheelBob {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-2px); }
+    }
+
+    /* ─── Speed lines ─── */
+    .lines {
+      position: absolute;
+      bottom: calc(30% + 20px);
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      animation: linesIn 2.4s forwards;
+      pointer-events: none;
+    }
+    @keyframes linesIn {
+      0%, 50%  { opacity: 0; }
+      55%      { opacity: 1; }
+      70%      { opacity: 0; }
+      100%     { opacity: 0; }
+    }
+    .line {
+      height: 2px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, rgba(249,115,22,0.6), transparent);
+      animation: lineMove 0.25s linear infinite;
+    }
+    .line:nth-child(1) { width: 100px; animation-delay: 0s; }
+    .line:nth-child(2) { width: 70px;  animation-delay: 0.05s; }
+    .line:nth-child(3) { width: 120px; animation-delay: 0.1s; }
+    @keyframes lineMove {
+      from { transform: translateX(0); opacity:1; }
+      to   { transform: translateX(-30px); opacity:0; }
+    }
+
+    /* ─── Glow orb under car ─── */
+    .glow {
+      position: absolute;
+      bottom: 28%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 40px;
+      background: radial-gradient(ellipse, rgba(249,115,22,0.25) 0%, transparent 70%);
+      animation: carRide 2.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      filter: blur(8px);
+      pointer-events: none;
+    }
+
+    /* ─── Logo ─── */
+    .logo-wrap {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      opacity: 0;
+      animation: logoReveal 0.7s ease 2.1s forwards;
+    }
+    @keyframes logoReveal {
+      from { opacity: 0; transform: translate(-50%, -46%); }
+      to   { opacity: 1; transform: translate(-50%, -50%); }
+    }
+    .logo-text {
+      font-size: clamp(64px, 20vw, 120px);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      background: linear-gradient(135deg, #fff 40%, #F97316 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .logo-sub {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      color: #475569;
+      margin-top: 8px;
+      text-transform: uppercase;
+    }
+
+    /* ─── Stars bg ─── */
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .star {
+      position: absolute;
+      width: 2px; height: 2px;
+      border-radius: 50%;
+      background: white;
+      opacity: 0;
+      animation: twinkle var(--d) ease-in-out infinite;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; }
+      50%       { opacity: var(--o); }
+    }
+
+    /* ─── Redirect bar ─── */
+    .redirect-bar {
+      position: absolute;
+      bottom: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      animation: logoReveal 0.5s ease 2.6s forwards;
+      text-align: center;
+    }
+    .redirect-bar p {
+      font-size: 13px;
+      color: #475569;
+      letter-spacing: 0.05em;
+    }
+    .progress-line {
+      width: 120px;
+      height: 2px;
+      background: #1E2230;
+      border-radius: 2px;
+      margin: 10px auto 0;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--orange, #F97316);
+      border-radius: 2px;
+      animation: fillBar 1.5s ease 2.7s forwards;
+    }
+    @keyframes fillBar {
+      from { width: 0%; }
+      to   { width: 100%; }
+    }
+    :root { --orange: #F97316; }
+  </style>
+</head>
+<body>
+
+  <!-- Stars -->
+  <div class="stars" id="stars"></div>
+
+  <!-- Road -->
+  <div class="road"></div>
+
+  <!-- Speed lines -->
+  <div class="lines">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </div>
+
+  <!-- Car -->
+  <div class="car-wrap">
+    <svg class="car-svg" width="140" height="64" viewBox="0 0 140 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Body -->
+      <rect x="8" y="28" width="124" height="26" rx="6" fill="#1E2230"/>
+      <!-- Cabin -->
+      <path d="M34 28 L46 10 Q50 6 58 6 H88 Q96 6 100 10 L110 28 Z" fill="#161820" stroke="#2C3147" stroke-width="1"/>
+      <!-- Windows -->
+      <path d="M50 26 L59 13 Q61 10 65 10 H80 Q83 10 85 13 L94 26 Z" fill="#0F1117" stroke="#F97316" stroke-width="0.8" opacity="0.8"/>
+      <!-- Mid divider -->
+      <line x1="72" y1="10" x2="72" y2="26" stroke="#F97316" stroke-width="0.8" opacity="0.6"/>
+      <!-- Orange trim -->
+      <rect x="8" y="42" width="124" height="3" fill="#F97316" opacity="0.6" rx="1"/>
+      <!-- Front grill -->
+      <rect x="124" y="32" width="8" height="14" rx="2" fill="#F97316" opacity="0.9"/>
+      <!-- Headlight -->
+      <rect x="126" y="30" width="5" height="5" rx="1" fill="#FDE68A"/>
+      <rect x="126" y="30" width="5" height="5" rx="1" fill="url(#hlGlow)" opacity="0.8"/>
+      <!-- Tail lights -->
+      <rect x="8" y="30" width="5" height="6" rx="1" fill="#EF4444" opacity="0.7"/>
+      <!-- Wheels -->
+      <circle cx="36" cy="54" r="10" fill="#0A0B10" stroke="#2C3147" stroke-width="2"/>
+      <circle cx="36" cy="54" r="5"  fill="#1E2230"/>
+      <circle cx="36" cy="54" r="2"  fill="#F97316"/>
+      <circle cx="104" cy="54" r="10" fill="#0A0B10" stroke="#2C3147" stroke-width="2"/>
+      <circle cx="104" cy="54" r="5"  fill="#1E2230"/>
+      <circle cx="104" cy="54" r="2"  fill="#F97316"/>
+      <!-- Door lines -->
+      <line x1="72" y1="28" x2="72" y2="54" stroke="#2C3147" stroke-width="1"/>
+      <!-- Handle -->
+      <rect x="60" y="38" width="8" height="2" rx="1" fill="#2C3147"/>
+      <rect x="76" y="38" width="8" height="2" rx="1" fill="#2C3147"/>
+      <defs>
+        <radialGradient id="hlGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#FDE68A" stop-opacity="1"/>
+          <stop offset="100%" stop-color="#F97316" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+    </svg>
+  </div>
+
+  <!-- Glow -->
+  <div class="glow"></div>
+
+  <!-- Logo (appears after car parks) -->
+  <div class="logo-wrap">
+    <div class="logo-text">HITCH</div>
+    <div class="logo-sub">Student Ride Sharing</div>
+  </div>
+
+  <!-- Redirect bar -->
+  <div class="redirect-bar">
+    <p>LOADING</p>
+    <div class="progress-line"><div class="progress-fill"></div></div>
+  </div>
+
+  <script>
+    // Stars
+    const starsEl = document.getElementById('stars');
+    for (let i = 0; i < 60; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.cssText = `
+        left:${Math.random()*100}%;
+        top:${Math.random()*100}%;
+        --d:${2+Math.random()*4}s;
+        --o:${0.2+Math.random()*0.5};
+        animation-delay:${Math.random()*4}s;
+      `;
+      starsEl.appendChild(s);
+    }
+
+    // Check if already logged in
+    const token = localStorage.getItem('hitchToken');
+
+    // Redirect after animation
+    setTimeout(() => {
+      window.location.href = token ? 'find-ride.html' : 'login.html';
+    }, 4300);
+  </script>
+</body>
+</html>
