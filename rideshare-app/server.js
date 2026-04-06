@@ -36,7 +36,76 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('Backend is running 🚀');
 });
+app.post('/rides', verifyToken, async (req, res) => {
+  const {
+    from,
+    to,
+    date,
+    timeRange,
+    mode,
+    totalSeats,
+    genderPreference
+  } = req.body;
 
+  const ride = {
+    postedBy: req.user.uid,   // 🔥 comes from middleware
+    from,
+    to,
+    date,
+    timeRange,
+    mode,
+    totalSeats,
+    seatsLeft: totalSeats,
+    genderPreference,
+    interestedUsers: [],
+    confirmedUsers: [],
+    status: 'active',
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+  };
+
+  const ref = await db.collection('rides').add(ride);
+  res.json({ rideId: ref.id });
+});
+// 🚕 GET RIDES WITH FILTERS
+app.get('/rides', verifyToken, async (req, res) => {
+  const { date, gender, from, to } = req.query;
+
+  let query = db
+    .collection('rides')
+    .where('status', '==', 'active')
+    .where('seatsLeft', '>', 0);
+
+  if (date) {
+    query = query.where('date', '==', date);
+  }
+
+  if (gender) {
+    query = query.where('genderPreference', 'in', [gender, 'any']);
+  }
+
+  const snapshot = await query.get();
+  const rides = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+
+  res.json(rides);
+});
+/* ❤️ Express Interest */
+app.post('/rides/:rideId/interest', verifyToken, async (req, res) => {
+  const rideRef = db.collection('rides').doc(req.params.rideId);
+  const rideSnap = await rideRef.get();
+
+  if (!rideSnap.exists) {
+    return res.status(404).json({ error: 'Ride not found' });
+  }
+
+  await rideRef.update({
+    interestedUsers: admin.firestore.FieldValue.arrayUnion(req.user.uid),
+  });
+
+  res.json({ success: true });
+});
 // 🚀 START SERVER
 const PORT = 5050;
 app.listen(PORT, () => {

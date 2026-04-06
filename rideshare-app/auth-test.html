@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Firebase Auth Test</title>
+</head>
+<body>
+
+<h2>Login</h2>
+
+<input type="email" id="email" placeholder="Email" />
+<input type="password" id="password" placeholder="Password" />
+<button onclick="login()">Login</button>
+
+<p id="token"></p>
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCGNLUG_MN5YDFaVKweACGFUdbMzN8xP4E",
+    authDomain: "hitch-8d742.firebaseapp.com",
+    projectId: "hitch-8d742",
+    storageBucket: "hitch-8d742.firebasestorage.app",
+    messagingSenderId: "29983465742",
+    appId: "1:29983465742:web:31813fd04e5104fb22b75f"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  window.login = async function () {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      const token = await userCred.user.getIdToken();
+
+      console.log("TOKEN:", token);
+      document.getElementById("token").innerText = token;
+
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    }
+  };
+</script>
+
+</body>
+</html>
