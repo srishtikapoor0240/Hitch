@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hitch — Offer a Ride</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 60px;
+      background: rgba(8,9,13,0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 14px;
+      z-index: 100;
+    }
+    .back-btn {
+      background: none;
+      border: none;
+      color: var(--txt-2);
+      cursor: pointer;
+      display: flex;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--txt); }
+    .top-bar h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .content { padding: 72px 16px 90px; max-width: 540px; margin: 0 auto; }
+
+    /* ─── Ride type selector ─── */
+    .mode-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .mode-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 16px;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .mode-card:hover { border-color: var(--border-hov); }
+    .mode-card.selected {
+      border-color: var(--orange);
+      background: var(--orange-dim);
+    }
+    .mode-card svg { width: 26px; height: 26px; color: var(--txt-3); transition: color 0.2s; }
+    .mode-card.selected svg { color: var(--orange); }
+    .mode-label { font-size: 13px; font-weight: 600; color: var(--txt-2); transition: color 0.2s; }
+    .mode-card.selected .mode-label { color: var(--orange); }
+    .mode-desc { font-size: 11px; color: var(--txt-3); }
+
+    /* ─── Section header ─── */
+    .section-head {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--txt-3);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 14px;
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-head::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ─── Success overlay ─── */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8,9,13,0.95);
+      backdrop-filter: blur(20px);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      animation: fadeIn 0.3s ease;
+      padding: 32px;
+    }
+    .success-overlay.hidden { display: none; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .success-icon {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: var(--green-dim);
+      border: 2px solid var(--green);
+      display: flex; align-items: center; justify-content: center;
+      animation: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+    }
+    @keyframes pop {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    .success-overlay h2 { font-size: 26px; font-weight: 800; text-align: center; }
+    .success-overlay p  { color: var(--txt-2); text-align: center; font-size: 14px; }
+
+    /* ─── Seats input ─── */
+    .seats-picker {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+    }
+    .seats-picker label { flex: 1; font-size: 14px; color: var(--txt-2); }
+    .seats-ctrl {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .seats-btn {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--txt);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      line-height: 1;
+    }
+    .seats-btn:hover { border-color: var(--orange); color: var(--orange); }
+    .seats-val { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; min-width: 24px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div id="toast-container"></div>
+
+  <!-- Success overlay -->
+  <div class="success-overlay hidden" id="success-overlay">
+    <div class="success-icon">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <h2>Ride Posted! 🎉</h2>
+    <p>Your ride is now live.<br>Students can start showing interest.</p>
+    <button class="btn btn-primary" onclick="window.location.href='my-rides.html'">View My Rides</button>
+    <button class="btn btn-outline" onclick="resetForm()">Post Another</button>
+  </div>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <button class="back-btn" onclick="history.back()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    </button>
+    <h1>Offer a Ride</h1>
+  </div>
+
+  <!-- Form -->
+  <div class="content">
+    <!-- Ride mode -->
+    <div class="section-head">Ride Type</div>
+    <div class="mode-selector">
+      <div class="mode-card selected" id="mode-cab" onclick="selectMode('cab')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/>
+          <rect x="9" y="11" width="14" height="10" rx="2"/>
+          <circle cx="12" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+        </svg>
+        <div class="mode-label">Cab / Taxi</div>
+        <div class="mode-desc">Sharing a booked cab</div>
+      </div>
+      <div class="mode-card" id="mode-personal" onclick="selectMode('personal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 11l19-9-9 19-2-8-8-2z"/>
+        </svg>
+        <div class="mode-label">Personal Car</div>
+        <div class="mode-desc">Driving yourself</div>
+      </div>
+    </div>
+
+    <!-- Route -->
+    <div class="section-head">Route</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">From *</label>
+        <input type="text" id="from" class="form-input" placeholder="e.g. Anna Nagar" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">To *</label>
+        <input type="text" id="to" class="form-input" placeholder="e.g. Airport" />
+      </div>
+    </div>
+
+    <!-- Date & Time -->
+    <div class="section-head">Schedule</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Date *</label>
+        <input type="date" id="date" class="form-input" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Time Range *</label>
+        <input type="text" id="timeRange" class="form-input" placeholder="e.g. 8–9 AM" />
+      </div>
+    </div>
+
+    <!-- Seats -->
+    <div class="section-head">Capacity</div>
+    <div class="seats-picker">
+      <label>Available Seats</label>
+      <div class="seats-ctrl">
+        <button class="seats-btn" onclick="changeSeat(-1)">−</button>
+        <div class="seats-val" id="seats-val">2</div>
+        <button class="seats-btn" onclick="changeSeat(1)">+</button>
+      </div>
+    </div>
+
+    <!-- Preferences -->
+    <div class="section-head">Preferences</div>
+    <div class="form-group">
+      <label class="form-label">Gender Preference</label>
+      <select id="genderPreference" class="form-select">
+        <option value="any">Any Gender</option>
+        <option value="female">Female Only</option>
+        <option value="male">Male Only</option>
+      </select>
+    </div>
+
+    <!-- Submit -->
+    <div style="margin-top: 32px;">
+      <button class="btn btn-primary btn-full" id="submit-btn" onclick="postRide()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+        <span id="btn-text">Post Ride</span>
+        <div class="spinner hidden" id="btn-spinner"></div>
+      </button>
+    </div>
+
+    <p style="text-align:center; color:var(--txt-3); font-size:12px; margin-top:16px;">
+      Your ride will be visible to all students on Hitch
+    </p>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a class="nav-item" href="find-ride.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Find
+    </a>
+    <a class="nav-item active" href="offer-ride.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      Offer
+    </a>
+    <a class="nav-item" href="my-rides.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      My Rides
+    </a>
+  </nav>
+
+  <script src="utils.js"></script>
+  <script>
+    if (!requireAuth()) throw new Error('Not authenticated');
+
+    let selectedMode = 'cab';
+    let seats = 2;
+
+    window.selectMode = function(mode) {
+      selectedMode = mode;
+      document.getElementById('mode-cab').classList.toggle('selected', mode === 'cab');
+      document.getElementById('mode-personal').classList.toggle('selected', mode === 'personal');
+    };
+
+    window.changeSeat = function(delta) {
+      seats = Math.max(1, Math.min(8, seats + delta));
+      document.getElementById('seats-val').textContent = seats;
+    };
+
+    // Set today as min date
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('date').min = today;
+    document.getElementById('date').value = today;
+
+    window.postRide = async function() {
+      const from   = document.getElementById('from').value.trim();
+      const to     = document.getElementById('to').value.trim();
+      const date   = document.getElementById('date').value;
+      const timeRange = document.getElementById('timeRange').value.trim();
+      const genderPreference = document.getElementById('genderPreference').value;
+
+      if (!from || !to || !date || !timeRange) {
+        showToast('Please fill in all required fields', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      const spinner = document.getElementById('btn-spinner');
+      const btnText = document.getElementById('btn-text');
+
+      btn.disabled = true;
+      spinner.classList.remove('hidden');
+      btnText.style.opacity = '0';
+
+      try {
+        await apiFetch('/rides', {
+          method: 'POST',
+          body: JSON.stringify({
+            from, to, date, timeRange,
+            mode: selectedMode,
+            totalSeats: seats,
+            genderPreference
+          })
+        });
+
+        document.getElementById('success-overlay').classList.remove('hidden');
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        spinner.classList.add('hidden');
+        btnText.style.opacity = '1';
+      }
+    };
+
+    window.resetForm = function() {
+      document.getElementById('success-overlay').classList.add('hidden');
+      document.getElementById('from').value      = '';
+      document.getElementById('to').value        = '';
+      document.getElementById('timeRange').value = '';
+      document.getElementById('date').value      = today;
+      document.getElementById('genderPreference').value = 'any';
+      seats = 2;
+      document.getElementById('seats-val').textContent = '2';
+      selectMode('cab');
+    };
+  </script>
+</body>
+</html>
