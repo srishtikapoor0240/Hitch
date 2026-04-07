@@ -73,11 +73,6 @@ async function apiFetch(path, options = {}) {
 
   return data;
 }
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Request failed");
-  return data;
-}
 
 // ─── Toast ────────────────────────────────────────────────────────────────
 function showToast(msg, type = "info") {
