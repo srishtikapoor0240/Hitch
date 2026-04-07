@@ -38,12 +38,41 @@ function requireAuth() {
 
 // ─── API Helpers ───────────────────────────────────────────────────────────
 async function apiFetch(path, options = {}) {
-  const token = getToken();
+  let token = localStorage.getItem("hitchToken");
+
+  // 🔄 Try refreshing token
+  if (window.firebaseAuth?.currentUser) {
+    try {
+      token = await window.firebaseAuth.currentUser.getIdToken(true);
+      localStorage.setItem("hitchToken", token);
+    } catch (err) {
+      console.log("Token refresh failed");
+    }
+  }
+
   const headers = {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers || {})
   };
+
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    if (res.status === 401) {
+      localStorage.clear(); // ✅ KEEP THIS
+      window.location.href = "login.html";
+    }
+    throw new Error(data.error || "Request failed");
+  }
+
+  return data;
+}
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Request failed");
