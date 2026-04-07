@@ -141,8 +141,8 @@ app.post('/rides/:rideId/confirm', verifyToken, async (req, res) => {
   res.json({ success: true });
 });
 // 🚀 START SERVER
-const PORT = 5050;
+const PORT = process.env.PORT || 5050;
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
